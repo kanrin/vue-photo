@@ -1,4 +1,7 @@
 # vue-photo
+> personal photo website please don't fork. Thank you!
+
+- server [photosGo](https://github.com/kanrin/photosGo)
 
 ## Project setup
 ```
