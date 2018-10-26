@@ -1,6 +1,14 @@
 <template>
-    <div class="preview-img-list" v-loading.fullscreen.lock="fullscreenLoading">
-        <img class="preview-img-item" v-for="(item, index) in items" v-bind:key="index" :src="item.src" @click="$photoswipe.open(index, items)" />
+    <div v-loading.fullscreen.lock="fullscreenLoading" style="width: 100%; text-align: center">
+        <el-card class="box-card" shadow="never">
+            <span class="preview-img-list">
+                <el-card shadow="always" class="preview-box" :body-style="{ padding: '0px' }" v-for="(item, index) in items" v-bind:key="index">
+                    <img class="preview-img-item" :src="item.src" @click="$photoswipe.open(index, items)" />
+                </el-card>
+            </span>
+            <br>
+            <el-pagination layout="prev, pager, next" :total="total" :page-size="pageSize" style="text-align: center" @current-change="onHandlePage"></el-pagination>
+        </el-card>
     </div>
 </template>
 
@@ -10,32 +18,70 @@
         flex-wrap: wrap;
         align-items: center;
     }
+    .preview-box {
+        flex: 1;
+    }
     .preview-img-item {
         margin: 5px;
-        max-width: 100px;
-        max-height: 100px;
+        max-width: 200px;
+        max-height: 200px;
     }
 </style>
 
 <script>
+  import { Message } from 'element-ui';
+
   export default {
     data () {
       return {
         fullscreenLoading: false,
-        items: [{"src":"http://localhost:8000/photos/_DSC1835.JPG","w":5456,"h":3064},{"src":"http://localhost:8000/photos/_DSC2265.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2300.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2302.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2303.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2304.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2305.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2306.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2309.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2310.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2311.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2313.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2316.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2320.JPG","w":1616,"h":1080},{"src":"http://localhost:8000/photos/_DSC2323.JPG","w":1616,"h":1080}]
+        srcs: [],
+        items: [],
+        total: 1,
+        pageSize: 20
       }
     },
     created() {
-//      this.fullscreenLoading = true;
-      fetch('http://localhost:8000').then((r) => {
+      const _this_ = this
+      _this_.fullscreenLoading = true;
+      fetch('http://localhost:8000', {
+        'content-type':'application/json',
+      }).then((r) => {
+        _this_.fullscreenLoading = false;
         if(r.ok) {
-          this.req = r
+          r.json().then(j => {
+            _this_.srcs = j
+            _this_.total = j.length
+            for (let i=0;i<_this_.pageSize;i++) {
+              _this_.items.push(_this_.srcs[i])
+            }
+          })
         } else {
-          this.req = 'fetch error'
+          Message({
+            message: 'Network Error',
+            type: 'warning',
+            duration: 5 * 1000
+          })
         }
       }).catch(e => {
-        this.req = e
+        Message({
+          message: e,
+          type: 'error',
+          duration: 5 * 1000
+        })
       })
+    },
+    methods: {
+      onHandlePage(page) {
+        const getValue = (currentValue, index) => {
+          const pagemin = (page-1)*this.pageSize
+          const pagemax = page*this.pageSize-1
+          if(index >= pagemin && index <= pagemax ) {
+            return currentValue
+          }
+        }
+        this.items = this.srcs.filter(getValue)
+      }
     }
   }
 </script>
