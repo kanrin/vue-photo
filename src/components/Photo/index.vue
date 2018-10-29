@@ -19,7 +19,7 @@
         align-items: center;
     }
     .preview-box {
-        flex: 1;
+        align-self: center;
     }
     .preview-img-item {
         margin: 5px;
@@ -44,7 +44,7 @@
     created() {
       const _this_ = this
       _this_.fullscreenLoading = true;
-      fetch('http://localhost:8000', {
+      fetch('/oss', {
         'content-type':'application/json',
       }).then((r) => {
         _this_.fullscreenLoading = false;
