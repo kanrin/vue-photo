@@ -7,7 +7,7 @@
                 </el-card>
             </span>
             <br>
-            <el-pagination layout="prev, pager, next" :total="total" :page-size="pageSize" style="text-align: center" @current-change="onHandlePage"></el-pagination>
+            <el-pagination background small layout="prev, pager, next" :total="total" :page-size="pageSize" style="text-align: center" @current-change="onHandlePage"></el-pagination>
         </el-card>
     </div>
 </template>
