@@ -1,9 +1,10 @@
 <template>
     <div v-loading.fullscreen.lock="fullscreenLoading" style="width: 100%; text-align: center">
         <el-card class="box-card" shadow="never">
+            <el-slider v-model="zoom" :min="100" :max="500" label="缩放" :show-tooltip="false"></el-slider>
             <span class="preview-img-list">
                 <el-card shadow="always" class="preview-box" :body-style="{ padding: '0px' }" v-for="(item, index) in items" v-bind:key="index">
-                    <img class="preview-img-item" :src="item.src" @click="$photoswipe.open(index, items)" />
+                    <img class="preview-img-item" :src="item.src" @click="$photoswipe.open(index, items)" :style="{'maxWidth': zoom + 'px' , 'maxHeight': zoom + 'px'}"/>
                 </el-card>
             </span>
             <br>
@@ -17,14 +18,14 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        padding: 10px;
+        justify-content: center;
     }
     .preview-box {
-        align-self: center;
+        margin: 5px;
     }
     .preview-img-item {
-        margin: 5px;
-        max-width: 200px;
-        max-height: 200px;
+        padding: 0;
     }
 </style>
 
@@ -38,13 +39,14 @@
         srcs: [],
         items: [],
         total: 1,
-        pageSize: 20
+        pageSize: 20,
+        zoom: 200
       }
     },
     created() {
       const _this_ = this
       _this_.fullscreenLoading = true;
-      fetch('/oss', {
+      fetch('http://localhost:8000/oss', {
         'content-type':'application/json',
       }).then((r) => {
         _this_.fullscreenLoading = false;
