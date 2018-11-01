@@ -1,6 +1,7 @@
 <template>
     <div v-loading.fullscreen.lock="fullscreenLoading" style="width: 100%; text-align: center">
         <el-card class="box-card" shadow="never">
+            <el-input-number v-model="pageSize" @change="handleChange" :min="10" :max="50" label="每页显示个数"></el-input-number>
             <el-slider v-model="zoom" :min="100" :max="500" label="缩放" :show-tooltip="false"></el-slider>
             <span class="preview-img-list">
                 <el-card shadow="always" class="preview-box" :body-style="{ padding: '0px' }" v-for="(item, index) in items" v-bind:key="index">
@@ -46,7 +47,7 @@
     created() {
       const _this_ = this
       _this_.fullscreenLoading = true;
-      fetch('http://localhost:8000/oss', {
+      fetch('/oss', {
         'content-type':'application/json',
       }).then((r) => {
         _this_.fullscreenLoading = false;
@@ -74,15 +75,18 @@
       })
     },
     methods: {
-      onHandlePage(page) {
+      onHandlePage(p) {
         const getValue = (currentValue, index) => {
-          const pagemin = (page-1)*this.pageSize
-          const pagemax = page*this.pageSize-1
+          const pagemin = (p-1)*this.pageSize
+          const pagemax = p*this.pageSize-1
           if(index >= pagemin && index <= pagemax ) {
             return currentValue
           }
         }
         this.items = this.srcs.filter(getValue)
+      },
+      handleChange(v) {
+        this.pageSize = v
       }
     }
   }
