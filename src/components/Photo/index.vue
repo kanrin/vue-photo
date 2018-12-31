@@ -1,17 +1,18 @@
 <template>
-    <div v-loading.fullscreen.lock="fullscreenLoading" style="width: 100%; text-align: center">
-        <el-card class="box-card" shadow="never">
-            <el-input-number v-model="pageSize" @change="handleChange" :min="10" :max="50" label="每页显示个数"></el-input-number>
-            <el-slider v-model="zoom" :min="100" :max="500" label="缩放" :show-tooltip="false"></el-slider>
-            <span class="preview-img-list">
-                <el-card shadow="always" class="preview-box" :body-style="{ padding: '0px' }" v-for="(item, index) in items" v-bind:key="index">
-                    <img class="preview-img-item" :src="item.src" @click="$photoswipe.open(index, items)" :style="{'maxWidth': zoom + 'px' , 'maxHeight': zoom + 'px'}"/>
-                </el-card>
-            </span>
-            <br>
-            <el-pagination background small layout="prev, pager, next" :total="total" :page-size="pageSize" style="text-align: center" @current-change="onHandlePage"></el-pagination>
-        </el-card>
-    </div>
+    <el-card class="box-card" shadow="never">
+        <el-slider v-model="zoom" :min="100" :max="1000" label="缩放" :show-tooltip="false"></el-slider>
+        <span class="preview-img-list">
+            <el-card shadow="always" class="preview-box" :body-style="{ padding: '0px' }" v-for="(item, index) in items" v-bind:key="index">
+                <vue-load-image>
+                    <img slot="preloader" :src="load" :style="{'maxWidth': zoom + 'px' , 'maxHeight': zoom + 'px'}"/>
+                    <img slot="error" :src="error" :style="{'maxWidth': zoom + 'px' , 'maxHeight': zoom + 'px'}"/>
+                    <img class="preview-img-item" slot="image" :src="item.src" @click="$photoswipe.open(index, items)" :style="{'maxWidth': zoom + 'px' , 'maxHeight': zoom + 'px'}"/>
+                </vue-load-image>
+            </el-card>
+        </span>
+        <br>
+        <el-pagination background small layout="prev, pager, next" :total="total" :page-size="pageSize" style="text-align: center" @current-change="onHandlePage"></el-pagination>
+    </el-card>
 </template>
 
 <style scoped>
@@ -32,31 +33,37 @@
 
 <script>
   import { Message } from 'element-ui';
+  import VueLoadImage from 'vue-load-image'
+  import load from '@/assets/db87a8a5a8d8d60c43672935134f4b14.gif'
+  import error from '@/assets/86e07ce84f12f8162f341057987999f3.jpeg'
 
   export default {
     data () {
       return {
-        fullscreenLoading: false,
         srcs: [],
         items: [],
         total: 1,
         pageSize: 20,
-        zoom: 200
+        zoom: 200,
+        load,
+        error
       }
     },
+    components: {
+      'vue-load-image': VueLoadImage
+    },
     created() {
-      const _this_ = this
-      _this_.fullscreenLoading = true;
-      fetch('/oss', {
+      this.fullscreenLoading = true;
+      fetch('http://localhost:8000/oss', {
         'content-type':'application/json',
       }).then((r) => {
-        _this_.fullscreenLoading = false;
+        this.fullscreenLoading = false;
         if(r.ok) {
           r.json().then(j => {
-            _this_.srcs = j
-            _this_.total = j.length
-            for (let i=0;i<_this_.pageSize;i++) {
-              _this_.items.push(_this_.srcs[i])
+            this.srcs = j
+            this.total = j.length
+            for (let i=0;i<this.pageSize;i++) {
+              this.items.push(this.srcs[i])
             }
           })
         } else {

@@ -10,6 +10,7 @@
   "dependencies": {
     "element-ui": "^2.4.5",
     "vue": "^2.5.17",
+    "vue-load-image": "^0.1.6",
     "vue-photoswipe": "^1.0.3"
   },
   "devDependencies": {
