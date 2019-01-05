@@ -1,5 +1,5 @@
 <template>
-    <el-card class="box-card" shadow="never">
+    <el-card class="box-card" shadow="never" v-loading.fullscreen.lock="fullscreenLoading">
         <el-slider v-model="zoom" :min="100" :max="1000" label="缩放" :show-tooltip="false"></el-slider>
         <span class="preview-img-list">
             <el-card shadow="always" class="preview-box" :body-style="{ padding: '0px' }" v-for="(item, index) in items" v-bind:key="index">
@@ -45,6 +45,7 @@
         total: 1,
         pageSize: 20,
         zoom: 200,
+        fullscreenLoading: true,
         load,
         error
       }
@@ -54,7 +55,7 @@
     },
     created() {
       this.fullscreenLoading = true;
-      fetch('http://localhost:8000/oss', {
+      fetch('/oss', {
         'content-type':'application/json',
       }).then((r) => {
         this.fullscreenLoading = false;
